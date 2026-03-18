@@ -31,7 +31,7 @@
 ## 4. Scope
 
 ### In Scope v1
-- Crawler Mercado Livre (Python + Playwright)
+- Crawler Mercado Livre
 - Extração: top 100 produtos por categoria
 - Dados: título, preço, link, imagem
 - Interface web básica (lista)
@@ -63,15 +63,15 @@
 - Estratégia: Paginação infinita via scroll
 
 ### Dados a extrair (v1)
-```python
+```json
 {
     "id": int,
-    "title": str,        # Título do produto
-    "price": str,        # Preço (R$ 1.234,56)
-    "link": str,         # URL do produto
-    "image": str,        # URL da imagem
-    "category": str,     # Categoria do crawl
-    "crawled_at": str    # ISO timestamp
+    "title": str,        // Título do produto
+    "price": str,        // Preço (R$ 1.234,56)
+    "link": str,         // URL do produto
+    "image": str,        // URL da imagem
+    "category": str,     // Categoria do crawl
+    "crawled_at": str    // ISO timestamp
 }
 ```
 
@@ -102,7 +102,6 @@
 ### Qualidade
 - [ ] Código limpos, com comments
 - [ ] README com instruções de setup
-- [ ] Requirements.txt completo
 
 ---
 
