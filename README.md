@@ -66,12 +66,8 @@ OffStorm é uma plataforma SaaS que consolida dados de múltiplos marketplaces e
 ## Como contribuir
 
 ```bash
-# Setup
-pip install -r requirements.txt
-playwright install chromium
-
-# Rodar crawler
-python -m crawler.mercadolivre
+# Setup (em definição)
+# Rodar crawler (em definição)
 ```
 
 ## Status

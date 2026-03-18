@@ -57,10 +57,10 @@
 
 ## 6. Technical Approach
 
-### Crawler
-- **Ferramenta:** Playwright (headless browser)
-- **Por que:** ML tem JavaScript rendering, requests simples não funcionam
-- **Estratégia:** Paginação infinita via scroll
+### Estratégia
+- Crawler do Mercado Livre (headless browser)
+- Por que: ML tem JavaScript rendering, requests simples não funcionam
+- Estratégia: Paginação infinita via scroll
 
 ### Dados a extrair (v1)
 ```python
