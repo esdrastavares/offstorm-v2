@@ -23,7 +23,7 @@
 **Objetivo v1:** Validar que existe demanda por uma ferramenta de product discovery com dados do Mercado Livre.
 
 **Métricas de sucesso:**
-- [ ] Crawler extrai +50 produtos por categoria rodando
+- [ ] Sistema extrai +50 produtos por categoria
 - [ ] Dados são completos (título, preço, link, imagem)
 - [ ] Interface mostra lista navegável
 - [ ] Tempo de pesquisa reduzido vs múltiplas abas
@@ -31,11 +31,11 @@
 ## 4. Scope
 
 ### In Scope v1
-- Crawler Mercado Livre
+- Fonte de dados: Mercado Livre
 - Extração: top 100 produtos por categoria
-- Dados: título, preço, link, imagem
+- Dados: título, preço, link, imagem, avaliações, vendas
 - Interface web básica (lista)
-- Dados em arquivo JSON (sem DB ainda)
+- Dados em arquivo/local storage (sem DB ainda)
 
 ### Out of Scope v1
 - Múltiplos marketplaces
@@ -50,61 +50,151 @@
 ```
 1. Usuário acessa interface
 2. Seleciona categoria (ex: "Eletrônicos")
-3. Sistema exibe top produtos do ML
-4. Usuário analiza dados (preço, título)
-5. Decide se nicho é viável
+3. Sistema carrega produtos do ML
+4. Usuário visualiza dados (preço, título, avaliações)
+5. Usuário pode filtrar/ordenar
+6. Decide se nicho é viável
 ```
 
-## 6. Technical Approach
+## 6. Funcionalidades
 
-### Estratégia
-- Crawler do Mercado Livre (headless browser)
-- Por que: ML tem JavaScript rendering, requests simples não funcionam
-- Estratégia: Paginação infinita via scroll
+### F1: Listagem de Produtos
+- Exibe lista de produtos por categoria
+- Mostra: imagem, título, preço, avaliações
+- Paginação ou scroll infinito
 
-### Dados a extrair (v1)
+### F2: Busca por Categoria
+- Lista de categorias disponíveis
+- Seleção de categoria filtra produtos
+- Categorias: Eletrônicos, Informática, Games, Beleza, Pets, Casa, Esportes, Brinquedos
+
+### F3: Filtros
+- Por faixa de preço
+- Por avaliação (estrelas)
+- Por quantidade de vendas
+
+### F4: Ordenação
+- Mais vendidos
+- Menor preço
+- Maior preço
+- Melhores avaliações
+
+### F5: Detalhes do Produto
+- Título completo
+- Preço atual
+- Número de avaliações
+- Link para o produto no marketplace
+
+## 7. Dados a extrair
+
 ```json
 {
-    "id": int,
-    "title": str,        // Título do produto
-    "price": str,        // Preço (R$ 1.234,56)
-    "link": str,         // URL do produto
-    "image": str,        // URL da imagem
-    "category": str,     // Categoria do crawl
-    "crawled_at": str    // ISO timestamp
+    "id": "ml123456789",
+    "title": "Nome do produto",
+    "price": 129.90,
+    "currency": "BRL",
+    "image": "https://ml...",
+    "link": "https://produto.ml/...",
+    "reviews_count": 150,
+    "rating": 4.5,
+    "sales_count": 89,
+    "category": "categoria",
+    "seller": {
+        "id": "seller123",
+        "name": "Nome da loja"
+    },
+    "extracted_at": "2026-03-17T23:30:00Z"
 }
 ```
 
-### Categorias inicial (teste)
-- Eletrônicos
-- Informática
-- Games
-- Beleza
-- Pets
-- Casa
-- Esportes
-- Brinquedos
+## 8. Fonte de Dados
 
-## 7. Acceptance Criteria
+- [x] API oficial do Mercado Livre
+- [ ] Crawler (scraping)
+- [ ] Provedor de dados externo
 
-### Crawler
-- [ ] Extrai no mínimo 50 produtos por categoria rodando
-- [ ] Trata erros de rede (retry)
-- [ ] Salva dados em JSON válido
-- [ ] Tempo de execução < 5 min por categoria
+### API Mercado Livre - Endpoints
 
-### Interface
-- [ ] Lista produtos com título e preço
-- [ ] Mostra imagem do produto
-- [ ] Link para produto no ML
-- [ ] Filtro por categoria
+**Busca de produtos:**
+```
+GET https://api.mercadolibre.com/sites/MLB/search?q={query}
+GET https://api.mercadolibre.com/sites/MLB/search?category={category_id}
+```
 
-### Qualidade
-- [ ] Código limpos, com comments
-- [ ] README com instruções de setup
+**Parâmetros:**
+- `q` — termo de busca
+- `category` — ID da categoria
+- `limit` — número de resultados
+- `offset` — paginação
+
+**Autenticação:**
+- Acesso público para buscas básicas
+- App ID necessário para produção
+
+### Dados retornados
+
+```json
+{
+  "results": [
+    {
+      "id": "MLB123456789",
+      "title": "Nome do produto",
+      "price": 129.90,
+      "currency_id": "BRL",
+      "thumbnail": "https://ml...",
+      "permalink": "https://produto.ml/...",
+      "reviews": { "rating": 4.5, "count": 150 },
+      "sold_quantity": 89,
+      "category_id": "MLB1234",
+      "seller": { "id": 123456789, "nickname": "loja" }
+    }
+  ]
+}
+```
+
+### Categorias MLB ( Marketplace Brasil)
+
+| Categoria | ID |
+|-----------|-----|
+| Eletrônicos | MLB1000 |
+| Informática | MLB1648 |
+| Games | MLB1144 |
+| Beleza | MLB1246 |
+| Pets | MLB1071 |
+| Casa | MLB1574 |
+| Esportes | MLB1276 |
+| Brinquedos | MLB1132 |
 
 ---
 
-**Versão:** 1.0  
+## 9. Arquitetura Proposta
+
+```
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│  Fonte de  │───▶│  Processa   │───▶│  Interface  │
+│   Dados    │    │   (parse)   │    │   (lista)   │
+└─────────────┘    └─────────────┘    └─────────────┘
+```
+
+## 10. Acceptance Criteria
+
+### Sistema
+- [ ] Extrai no mínimo 50 produtos por categoria
+- [ ] Trata erros de rede
+- [ ] Salva dados em formato utilizável
+
+### Interface
+- [ ] Lista produtos com imagem, título e preço
+- [ ] Link para produto no ML
+- [ ] Filtro por categoria
+- [ ] Ordenação básica
+
+### Qualidade
+- [ ] Código organizado
+- [ ] README com instruções
+
+---
+
+**Versão:** 1.1  
 **Data:** 2026-03-17  
-**Status:** Pronto para implementação
+**Status:** Em revisão
